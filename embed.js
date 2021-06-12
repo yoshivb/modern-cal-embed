@@ -176,7 +176,7 @@ function renderAgenda(events) {
 			todayHasEvents = true;
 			row = document.createElement('tr');
 			row.appendChild(createDateCell(
-				events[i].startDate,
+				today.valueOf(),
 				true
 			));
 			column = document.createElement('td');
