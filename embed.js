@@ -21,7 +21,7 @@ const colorThemeText = url.searchParams.get('colorsecondarytxt') || '#FFFFFF';
 
 let today = new Date();
 today.setHours(0,0,0,0);
-let selectedDay = new Date(today.valueOf());
+let selectedDate = new Date(today.valueOf());
 let selectedView = default_view;
 
 function getHumanDate(date) {
@@ -36,7 +36,7 @@ function createDateCell(date, todayd = false) {
 	dateCell.tabIndex = '-1';
 	dateCell.dataset.date = getHumanDate(date);
 	dateCell.onfocus = () => {
-		selectDay(getHumanDate(date), false)
+		selectDate(getHumanDate(date), false)
 	};
 	if (todayd) {
 		dateCell.className = 'today';
@@ -58,23 +58,13 @@ function createDateCell(date, todayd = false) {
 	return dateCell;
 }
 
-function selectDay(date, focus = true, events = null) {
+function selectDate(date, focus = true, events = null) {
 	let newSelection = new Date(date + 'T00:00');
-	let newMonth = false;
-	if (selectedDay.getMonth() != newSelection.getMonth() && events != null) {
-		renderMonth(events, newSelection);
-		newMonth = true;
-	}
+	selectedDate = newSelection;
 
-	selectedDay = newSelection;
+	setView(selectedView, events);
 
-	document.querySelector('#date_label span').innerHTML = `${DAYS_OF_WEEK[selectedDay.getDay()]}, ${MONTHS[selectedDay.getMonth()]} ${selectedDay.getDate()}`;
-	document.getElementById('date').value = getHumanDate(selectedDay);
-
-	let selectedElement = document.querySelector(`td[data-date='${getHumanDate(selectedDay)}']`);
-	if (selectedElement && (focus || newMonth)) {
-		selectedElement.focus();
-	}
+	document.querySelector('#date_label span').innerHTML = `${MONTHS[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
 }
 
 function setView(newView, events) {
@@ -151,9 +141,13 @@ function eventDetails(event) {
 function renderAgenda(events) {
 	// Filter after today
 	events = events.filter((e) => {
-		let end = new Date(e.endDate.valueOf());
-		end.setHours(0,0,0,0);
-		return end >= today;
+		let startMonth = e.startDate.getMonth();
+		let endMonth = e.endDate.getMonth();
+		let startYear = e.startDate.getFullYear();
+		let endYear = e.endDate.getFullYear();
+		let selectedMonth = selectedDate.getMonth();
+		let selectedYear = selectedDate.getFullYear();
+		return startMonth <= selectedMonth && endMonth >= selectedMonth && startYear <= selectedYear && endYear >= selectedYear;
 	});
 
 	// Create elements
@@ -277,7 +271,7 @@ function renderAgenda(events) {
 		let emptystate = document.createElement('tr');
 		emptystate.id = 'emptystate';
 		let emptydata = document.createElement('td');
-		emptydata.appendChild(document.createTextNode('No upcoming events'));
+		emptydata.appendChild(document.createTextNode('No events this month'));
 		emptystate.appendChild(emptydata);
 		agenda.appendChild(emptystate);
 	}
@@ -326,7 +320,7 @@ function renderMonth(events, fromDay = new Date(today.valueOf())) {
 			let dayCell = document.createElement('td');
 			dayCell.dataset.date = getHumanDate(day);
 			dayCell.onfocus = () => {
-				selectDay(dayCell.dataset.date, false, events);
+				selectDate(dayCell.dataset.date, false, events);
 			};
 			dayCell.tabIndex = '-1';
 			if (day < today) {
@@ -400,17 +394,17 @@ function renderCalendar(meta, events) {
 	let arrows = document.getElementById('arrows');
 	btn_today.onclick = () => {
 		// Scroll to today
-		selectDay(getHumanDate(today), true, events);
+		selectDate(getHumanDate(today), true, events);
 	};
 	document.getElementById('btn_prev').onclick = () => {
-		let prevDay = new Date(selectedDay.valueOf());
-		prevDay.setDate(prevDay.getDate() - 1);
-		selectDay(getHumanDate(prevDay), true, events);
+		let prevDay = new Date(selectedDate.valueOf());
+		prevDay.setMonth(prevDay.getMonth() - 1);
+		selectDate(getHumanDate(prevDay), true, events);
 	};
 	document.getElementById('btn_next').onclick = () => {
-		let prevDay = new Date(selectedDay.valueOf());
-		prevDay.setDate(prevDay.getDate() + 1);
-		selectDay(getHumanDate(prevDay), true, events);
+		let nextDay = new Date(selectedDate.valueOf());
+		nextDay.setMonth(nextDay.getMonth() + 1);
+		selectDate(getHumanDate(nextDay), true, events);
 	};
 	if (show_nav == 0) {
 		btn_today.style.display = 'none';
@@ -429,12 +423,7 @@ function renderCalendar(meta, events) {
 
 	// Date
 	let date_label = document.getElementById('date_label');
-	let date_input = document.getElementById('date');
-	document.querySelector('#date_label span').innerHTML = `${DAYS_OF_WEEK[selectedDay.getDay()]}, ${MONTHS[selectedDay.getMonth()]} ${selectedDay.getDate()}`;
-	date_input.value = getHumanDate(selectedDay);
-	date_input.onchange = () => {
-		selectDay(date_input.value, true, events);
-	};
+	document.querySelector('#date_label span').innerHTML = `${MONTHS[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
 	if (show_date == 0) {
 		date_label.style.display = 'none';
 	}
@@ -513,14 +502,16 @@ function parseCalendar(data) {
 }
 
 if (ical) {
-	fetch(ical).then((response) => {
-		response.text().then((text) => {
-			parseCalendar(text);
-		});
+	fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(ical)}`)
+	.then((response) => {
+		if (response.ok) return response.json()
+		throw new Error('Network response was not ok.')
 	}).catch((e) => {
 		console.error(e);
 		loading.innerHTML = "Error: iCal URL doesn't exist or isn't valid<br><br>iCal links (like those from Google calendar) will need to use a cors proxy";
-	});
+	}).then(data => {
+		parseCalendar(data.contents);
+	})
 } else {
 	loading.innerHTML = "Error: no iCal URL provided";
 }
