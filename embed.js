@@ -64,7 +64,7 @@ function selectDate(date, focus = true, events = null) {
 
 	setView(selectedView, events);
 
-	document.querySelector('#date_label span').innerHTML = `${MONTHS[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+	document.querySelector('#date_label span').innerHTML = `${selectedDate.getFullYear()}`;
 }
 
 function setView(newView, events) {
@@ -141,13 +141,10 @@ function eventDetails(event) {
 function renderAgenda(events) {
 	// Filter after today
 	events = events.filter((e) => {
-		let startMonth = e.startDate.getMonth();
-		let endMonth = e.endDate.getMonth();
 		let startYear = e.startDate.getFullYear();
 		let endYear = e.endDate.getFullYear();
-		let selectedMonth = selectedDate.getMonth();
 		let selectedYear = selectedDate.getFullYear();
-		return startMonth <= selectedMonth && endMonth >= selectedMonth && startYear <= selectedYear && endYear >= selectedYear;
+		return startYear <= selectedYear && endYear >= selectedYear;
 	});
 
 	// Create elements
@@ -407,12 +404,12 @@ function renderCalendar(meta, events) {
 	// Nav
 	document.getElementById('btn_prev').onclick = () => {
 		let prevDay = new Date(selectedDate.valueOf());
-		prevDay.setMonth(prevDay.getMonth() - 1);
+		prevDay.setFullYear(prevDay.getFullYear() - 1);
 		selectDate(getHumanDate(prevDay), true, events);
 	};
 	document.getElementById('btn_next').onclick = () => {
 		let nextDay = new Date(selectedDate.valueOf());
-		nextDay.setMonth(nextDay.getMonth() + 1);
+		nextDay.setFullYear(nextDay.getFullYear() + 1);
 		selectDate(getHumanDate(nextDay), true, events);
 	};
 	if (show_nav == 0) {
@@ -432,7 +429,7 @@ function renderCalendar(meta, events) {
 
 	// Date
 	let date_label = document.getElementById('date_label');
-	document.querySelector('#date_label span').innerHTML = `${MONTHS[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+	document.querySelector('#date_label span').innerHTML = `${selectedDate.getFullYear()}`;
 	if (show_date == 0) {
 		date_label.style.display = 'none';
 	}
