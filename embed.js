@@ -405,12 +405,6 @@ function renderCalendar(meta, events) {
 	}
 
 	// Nav
-	let btn_today = document.getElementById('btn_today');
-	let arrows = document.getElementById('arrows');
-	btn_today.onclick = () => {
-		// Scroll to today
-		selectDate(getHumanDate(today), true, events);
-	};
 	document.getElementById('btn_prev').onclick = () => {
 		let prevDay = new Date(selectedDate.valueOf());
 		prevDay.setMonth(prevDay.getMonth() - 1);

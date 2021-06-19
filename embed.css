@@ -51,6 +51,7 @@ body {
 nav {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 }
 nav .spacer {
 	flex: 1;
