@@ -160,8 +160,7 @@ function renderAgenda(events) {
 	indicator.title = `${now} ${nowM}`;
 	let indicatorset = false;
 	let todayHasEvents = false;
-	let maxDays = (events.length < AGENDA_DAYS ? events.length : AGENDA_DAYS);
-	for (let i = 0; i < maxDays; i++) {
+	for (let i = 0; i < events.length; i++) {
 		let tomorrow = new Date(today.valueOf());
 		tomorrow.setDate(tomorrow.getDate() + 1);
 		if (events[i].startDate > tomorrow && !todayHasEvents) {
