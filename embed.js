@@ -163,7 +163,8 @@ function renderAgenda(events) {
 	indicator.title = `${now} ${nowM}`;
 	let indicatorset = false;
 	let todayHasEvents = false;
-	for (let i = 0; i < (events.length < AGENDA_DAYS ? events.length : AGENDA_DAYS); i++) {
+	let maxDays = (events.length < AGENDA_DAYS ? events.length : AGENDA_DAYS);
+	for (let i = 0; i < maxDays; i++) {
 		let tomorrow = new Date(today.valueOf());
 		tomorrow.setDate(tomorrow.getDate() + 1);
 		if (events[i].startDate > tomorrow && !todayHasEvents) {
@@ -257,6 +258,20 @@ function renderAgenda(events) {
 			row.appendChild(column);
 			days.push(row);
 		}
+	}
+
+	if (events.length > 0 && !todayHasEvents) {
+		todayHasEvents = true;
+		row = document.createElement('tr');
+		row.appendChild(createDateCell(
+			today,
+			true
+		));
+		column = document.createElement('td');
+		column.className = 'emptyday';
+		column.appendChild(document.createTextNode('No events today'));
+		row.appendChild(column);
+		days.push(row);
 	}
 
 	let agenda = document.getElementById('agenda');
