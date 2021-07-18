@@ -256,7 +256,7 @@ function renderAgenda(events) {
 		}
 	}
 
-	if (events.length > 0 && !todayHasEvents) {
+	if (events.length > 0 && !todayHasEvents && today.getFullYear() == selectedDate.getFullYear()) {
 		todayHasEvents = true;
 		row = document.createElement('tr');
 		row.appendChild(createDateCell(
@@ -282,7 +282,7 @@ function renderAgenda(events) {
 		let emptystate = document.createElement('tr');
 		emptystate.id = 'emptystate';
 		let emptydata = document.createElement('td');
-		emptydata.appendChild(document.createTextNode('No events this month'));
+		emptydata.appendChild(document.createTextNode('No events this year'));
 		emptystate.appendChild(emptydata);
 		agenda.appendChild(emptystate);
 	}
@@ -291,6 +291,10 @@ function renderAgenda(events) {
 	if(todayElements.length > 0)
 	{
 		todayElements[0].scrollIntoView(false);
+	}
+	else if(days.length > 0)
+	{
+		days[days.length-1].scrollIntoView(false);
 	}
 }
 
