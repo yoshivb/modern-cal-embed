@@ -290,7 +290,7 @@ function renderAgenda(events) {
 	let todayElements = document.getElementsByClassName("today");
 	if(todayElements.length > 0)
 	{
-		todayElements[0].scrollIntoView();
+		todayElements[0].scrollIntoView(false);
 	}
 }
 
