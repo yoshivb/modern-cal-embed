@@ -163,7 +163,7 @@ function renderAgenda(events) {
 	for (let i = 0; i < events.length; i++) {
 		let tomorrow = new Date(today.valueOf());
 		tomorrow.setDate(tomorrow.getDate() + 1);
-		if (events[i].startDate > tomorrow && !todayHasEvents) {
+		if (events[i].startDate > tomorrow && !todayHasEvents && today.getFullYear() == selectedDate.getFullYear()) {
 			todayHasEvents = true;
 			row = document.createElement('tr');
 			row.appendChild(createDateCell(
@@ -294,7 +294,10 @@ function renderAgenda(events) {
 	}
 	else if(days.length > 0)
 	{
-		days[days.length-1].scrollIntoView(false);
+		let index = 0;
+		if(selectedDate.getFullYear() < today.getFullYear())
+			index = days.length-1;
+		days[index].scrollIntoView(false);
 	}
 }
 
