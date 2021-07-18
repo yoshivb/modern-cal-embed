@@ -286,6 +286,12 @@ function renderAgenda(events) {
 		emptystate.appendChild(emptydata);
 		agenda.appendChild(emptystate);
 	}
+
+	let todayElements = document.getElementsByClassName("today");
+	if(todayElements.length > 0)
+	{
+		todayElements[0].scrollIntoView();
+	}
 }
 
 function showMonthDetails(event) {
